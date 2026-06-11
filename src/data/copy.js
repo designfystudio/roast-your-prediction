@@ -1,6 +1,41 @@
 // All user-facing text lives here so non-code copy edits are trivial.
 
 export const copy = {
+  titles: {
+    home: 'The Banter Toolbox — World Cup 2026',
+    roast: 'AI Roasts Your Predictions — The Banter Toolbox',
+  },
+
+  nav: {
+    brand: 'The Banter Toolbox',
+    roast: 'Roast',
+    excuse: 'Excuse',
+    soon: 'Soon',
+  },
+
+  home: {
+    headline: 'The Banter Toolbox',
+    promise: 'AI-powered ammunition for the group chat, all tournament long.',
+    roastTool: {
+      name: 'AI Roasts Your Predictions',
+      pitch: 'Call the champion, the dark horse, the first big flop — and get torn apart by a pundit who has seen it all since 1970.',
+      sample: '“England as champion AND dark horse — sixty years of hurt and you’ve pre-ordered another summer of it.”',
+      cta: 'Get roasted →',
+    },
+    excuseTool: {
+      name: 'Fan Excuse Generator',
+      pitch: 'Lost? Robbed by the ref? Didn’t even qualify? Get your official, certified excuse — with a Denial Level to match.',
+      sample: '“The grass was simply too horizontal for our style of play.”',
+      badge: 'In build — coming soon',
+    },
+    emailSlot: {
+      title: 'One email per matchday banter drop',
+      note: 'Email capture coming soon — no spam, just new tools and lore.',
+      placeholder: 'you@example.com',
+      button: 'Notify me',
+    },
+  },
+
   app: {
     title: 'AI Roasts Your Predictions',
     tagline: 'Call the tournament. Get destroyed for it.',
