@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The Banter Toolbox tab mark: dark pitch square, lime "B!" -->
+  <rect width="64" height="64" rx="14" fill="#09090b"/>
+  <text x="32" y="49" font-family="Arial Narrow, Impact, Haettenschweiler, sans-serif" font-size="46" font-weight="bold" fill="#a3e635" text-anchor="middle">B!</text>
+</svg>

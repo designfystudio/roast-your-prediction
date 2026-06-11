@@ -75,8 +75,8 @@ export const copy = {
     roastAgain: 'Roast me again',
     startOver: 'Start over',
     tryAgain: 'Try again',
-    downloadPng: 'Download PNG',
-    share: 'Share 📤',
+    shareFeed: 'Share to feed/chat',
+    shareStory: 'Share to Stories',
   },
 
   errors: {
@@ -98,8 +98,8 @@ export const copy = {
     courageLabel: 'COURAGE RATING',
     watermark: 'bantertoolbox.com',
     shareText: 'The AI pundit rated my tournament predictions. Get roasted yourself:',
-    copied: 'Card copied to clipboard 📋',
-    shareFailed: 'Could not share — try Download instead.',
+    downloaded: 'PNG saved — post it anywhere 📲',
+    shareFailed: 'Could not share — try again.',
     downloading: 'Rendering…',
   },
 
