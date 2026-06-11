@@ -135,5 +135,8 @@ export const copy = {
   footer: {
     disclaimer: 'Not affiliated with FIFA. Just here for the banter.',
     kofi: 'Buy us a coffee ☕ (coming soon)',
+    socialsLabel: 'More banter on YouTube →',
+    youtube: { label: 'Maton Football', url: 'https://www.youtube.com/@MatonFootball' },
+    affiliateFallbackLabel: 'Our partner →',
   },
 }
