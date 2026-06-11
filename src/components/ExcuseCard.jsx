@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { copy } from '../data/copy'
 import { exportCardPng } from '../lib/shareCard'
 import Flag from './Flag'
+import SocialShareLinks from './SocialShareLinks'
 
 const FILE_NAME = 'official-excuse.png'
 
@@ -397,6 +398,10 @@ export default function ExcuseCard({ team, situationLabel, excuse, denialLevel }
         </button>
       </div>
       {feedback && <p className="text-center text-sm text-zinc-400">{feedback}</p>}
+      <SocialShareLinks
+        text={copy.excuseCard.shareText}
+        url={`${window.location.origin}/excuse`}
+      />
     </section>
   )
 }

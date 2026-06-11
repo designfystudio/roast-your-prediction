@@ -3,6 +3,7 @@ import { getTeam } from '../data/teams'
 import { copy } from '../data/copy'
 import { exportCardPng, downloadCard, shareCard } from '../lib/shareCard'
 import Flag from './Flag'
+import SocialShareLinks from './SocialShareLinks'
 
 // The 1080×1350 (4:5) card itself. Inline px styles throughout: this face is a
 // fixed-size print artifact, not a responsive component — it renders once
@@ -268,6 +269,10 @@ export default function ShareCard({ picks, roast, courageRating, autoExportTest 
         </button>
       </div>
       {feedback && <p className="text-center text-sm text-zinc-400">{feedback}</p>}
+      <SocialShareLinks
+        text={copy.shareCard.shareText}
+        url={`${window.location.origin}/roast`}
+      />
     </section>
   )
 }
