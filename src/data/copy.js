@@ -128,6 +128,10 @@ export const copy = {
     },
   },
 
+  excuseCard: {
+    shareText: 'My team has been officially defended. Get your excuse:',
+  },
+
   footer: {
     disclaimer: 'Not affiliated with FIFA. Just here for the banter.',
     kofi: 'Buy us a coffee ☕ (coming soon)',

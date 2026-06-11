@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { teams } from '../data/teams'
 import { copy } from '../data/copy'
 import { requestExcuse } from '../lib/api'
+import { useTypingEffect } from '../lib/useTypingEffect'
 import TeamPicker from '../components/TeamPicker'
+import ExcuseCard from '../components/ExcuseCard'
 import Flag from '../components/Flag'
 
 const SITUATIONS = [
@@ -14,28 +16,6 @@ const SITUATIONS = [
   { id: 'didnt-qualify', label: "Didn't even qualify" },
 ]
 
-function DenialMeter({ level }) {
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-baseline justify-between">
-        <span className="font-display text-sm uppercase tracking-wider text-zinc-500">
-          {copy.excuse.result.denialLabel}
-        </span>
-        <span className="font-display text-5xl text-orange-400">
-          {level}
-          <span className="text-2xl text-zinc-500">/100</span>
-        </span>
-      </div>
-      <div className="h-4 w-full overflow-hidden rounded-full bg-zinc-800">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-orange-500 to-red-500"
-          style={{ width: `${level}%` }}
-        />
-      </div>
-    </div>
-  )
-}
-
 export default function ExcusePage() {
   const [step, setStep] = useState(1)
   const [teamId, setTeamId] = useState(null)
@@ -44,6 +24,9 @@ export default function ExcusePage() {
   const [phase, setPhase] = useState('form') // 'form' | 'loading' | 'result' | 'error'
   const [result, setResult] = useState(null) // { excuse, denialLevel }
   const [errorMsg, setErrorMsg] = useState('')
+
+  // 20 ms/char — excuses are ≤30 words so this resolves in ~2-3 s
+  const [displayedExcuse, excuseDone] = useTypingEffect(result?.excuse, 20)
 
   useEffect(() => {
     document.title = copy.titles.excuse
@@ -54,6 +37,7 @@ export default function ExcusePage() {
   }, [situation])
 
   const team = teams.find((t) => t.id === teamId)
+  const situationLabel = SITUATIONS.find((s) => s.id === situation)?.label ?? ''
 
   const doExcuse = async () => {
     setPhase('loading')
@@ -89,6 +73,7 @@ export default function ExcusePage() {
       </header>
 
       <main className="flex-1">
+        {/* ── FORM ── */}
         {phase === 'form' && (
           <div className="flex flex-col gap-8">
             {step === 1 && (
@@ -190,6 +175,7 @@ export default function ExcusePage() {
           </div>
         )}
 
+        {/* ── LOADING ── */}
         {phase === 'loading' && (
           <div className="flex flex-col items-center gap-5 py-20">
             <div className="animate-bounce text-6xl">⚖️</div>
@@ -199,6 +185,7 @@ export default function ExcusePage() {
           </div>
         )}
 
+        {/* ── ERROR ── */}
         {phase === 'error' && (
           <div className="flex flex-col items-center gap-4 py-20 text-center">
             <p className="text-zinc-300">{copy.excuse.errors.failed}</p>
@@ -222,25 +209,65 @@ export default function ExcusePage() {
           </div>
         )}
 
+        {/* ── RESULT ── */}
         {phase === 'result' && result && team && (
           <div className="flex flex-col gap-6">
+            {/* team + situation chips */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200">
                 <Flag team={team} size="sm" className="h-4 w-auto rounded-sm" />
                 {team.name}
               </span>
               <span className="rounded-full bg-orange-500/15 px-3 py-1.5 font-display text-xs uppercase tracking-wider text-orange-400">
-                {SITUATIONS.find((s) => s.id === situation)?.label}
+                {situationLabel}
               </span>
             </div>
 
-            <div className="rounded-2xl border border-orange-500/30 bg-zinc-900/80 p-6">
-              <p className="font-display text-3xl uppercase leading-tight text-zinc-100 sm:text-4xl">
-                {result.excuse}
+            {/* typing-effect excuse display — mirrors the certificate feel inline */}
+            <div className="relative overflow-hidden rounded-xl border border-orange-500/25 border-t-4 border-t-orange-500 bg-zinc-900 p-6 pt-8">
+              <span
+                aria-hidden="true"
+                className="absolute -top-3 left-3 font-display text-8xl leading-none text-zinc-800"
+              >
+                "
+              </span>
+              <p className="relative font-display text-2xl uppercase leading-snug text-zinc-100 sm:text-3xl">
+                {displayedExcuse}
+                {!excuseDone && (
+                  <span className="ml-0.5 inline-block w-0.5 animate-pulse bg-orange-400">&nbsp;</span>
+                )}
               </p>
+
+              {/* denial level — shown immediately, number reveals with full text */}
+              <div className="relative mt-5 flex items-baseline gap-3">
+                <span className="font-display text-sm uppercase tracking-[0.2em] text-zinc-500">
+                  {copy.excuse.result.denialLabel}
+                </span>
+                <span className="font-display text-5xl text-orange-400">
+                  {excuseDone ? result.denialLevel : '—'}
+                </span>
+                {excuseDone && <span className="text-zinc-500">/ 100</span>}
+              </div>
+
+              {excuseDone && (
+                <div className="relative mt-3 h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-orange-500 to-red-500"
+                    style={{ width: `${result.denialLevel}%` }}
+                  />
+                </div>
+              )}
             </div>
 
-            <DenialMeter level={result.denialLevel} />
+            {/* share card — appears once typing finishes */}
+            {excuseDone && (
+              <ExcuseCard
+                team={team}
+                situationLabel={situationLabel}
+                excuse={result.excuse}
+                denialLevel={result.denialLevel}
+              />
+            )}
 
             <div className="flex justify-center gap-3">
               <button
@@ -259,6 +286,7 @@ export default function ExcusePage() {
               </button>
             </div>
 
+            {/* cross-link to roast */}
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-center">
               <p className="text-sm text-zinc-500">Brave enough to predict the rest?</p>
               <Link

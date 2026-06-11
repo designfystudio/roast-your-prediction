@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getTeam } from '../data/teams'
 import { copy } from '../data/copy'
 import { requestRoast } from '../lib/api'
+import { useTypingEffect } from '../lib/useTypingEffect'
 import PredictionForm from '../components/PredictionForm'
 import RoastCard from '../components/RoastCard'
 import ShareCard from '../components/ShareCard'
@@ -32,6 +33,12 @@ export default function RoastPage() {
   const [picks, setPicks] = useState(CARD_TEST ? TEST_FIXTURE.picks : null)
   const [roast, setRoast] = useState(CARD_TEST ? TEST_FIXTURE.roast : null) // { roast, courageRating }
   const [errorMsg, setErrorMsg] = useState('')
+
+  // 13 ms/char — roasts are ≤50 words so this resolves in ~3 s.
+  // CARD_TEST skips typing so the share-card export test fires immediately.
+  const [displayedRoast, roastDone] = useTypingEffect(CARD_TEST ? null : roast?.roast, 13)
+  const shownRoast = CARD_TEST ? roast?.roast : displayedRoast
+  const showShareCard = CARD_TEST || roastDone
 
   useEffect(() => {
     document.title = copy.titles.roast
@@ -123,14 +130,16 @@ export default function RoastPage() {
               </span>
             </div>
 
-            <RoastCard roast={roast.roast} courageRating={roast.courageRating} />
+            <RoastCard roast={shownRoast} courageRating={roast.courageRating} typing={!roastDone && !CARD_TEST} />
 
-            <ShareCard
-              picks={picks}
-              roast={roast.roast}
-              courageRating={roast.courageRating}
-              autoExportTest={CARD_TEST}
-            />
+            {showShareCard && (
+              <ShareCard
+                picks={picks}
+                roast={roast.roast}
+                courageRating={roast.courageRating}
+                autoExportTest={CARD_TEST}
+              />
+            )}
 
             <div className="flex justify-center gap-3">
               <button
