@@ -215,12 +215,13 @@ export default function ShareCard({ picks, roast, courageRating, autoExportTest 
     })()
   }, [autoExportTest])
 
-  const run = async (fn) => {
+  const run = async (fn, eventName) => {
     setBusy(true)
     setFeedback('')
     try {
       const result = await fn(masterRef.current)
       if (result === 'copied') setFeedback(copy.shareCard.copied)
+      if (eventName) window.plausible?.(eventName)
     } catch (err) {
       if (err?.name !== 'AbortError') setFeedback(copy.shareCard.shareFailed)
     } finally {
@@ -254,7 +255,7 @@ export default function ShareCard({ picks, roast, courageRating, autoExportTest 
         <button
           type="button"
           disabled={busy}
-          onClick={() => run(downloadCard)}
+          onClick={() => run(downloadCard, 'card_download')}
           className="rounded-xl bg-lime-400 px-7 py-4 font-display text-lg uppercase tracking-wide text-zinc-950 shadow-[0_0_24px] shadow-lime-400/30 hover:bg-lime-300 disabled:opacity-50 disabled:shadow-none"
         >
           {busy ? copy.shareCard.downloading : copy.buttons.downloadPng}
@@ -271,7 +272,7 @@ export default function ShareCard({ picks, roast, courageRating, autoExportTest 
       {feedback && <p className="text-center text-sm text-zinc-400">{feedback}</p>}
       <SocialShareLinks
         text={copy.shareCard.shareText}
-        url={`${window.location.origin}/roast`}
+        url={`${copy.siteUrl}/roast`}
       />
     </section>
   )

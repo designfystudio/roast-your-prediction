@@ -50,6 +50,7 @@ export default function RoastPage() {
       const result = await requestRoast(submittedPicks)
       setRoast(result)
       setPhase('result')
+      window.plausible?.('generate_roast')
     } catch (err) {
       setErrorMsg(err.message || copy.errors.roastFailed)
       setPhase('error')

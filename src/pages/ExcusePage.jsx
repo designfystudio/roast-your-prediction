@@ -47,6 +47,7 @@ export default function ExcusePage() {
       const data = await requestExcuse(payload)
       setResult(data)
       setPhase('result')
+      window.plausible?.('generate_excuse')
     } catch (err) {
       setErrorMsg(err.message || copy.excuse.errors.failed)
       setPhase('error')

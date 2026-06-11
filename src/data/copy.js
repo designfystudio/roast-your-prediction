@@ -1,6 +1,8 @@
 // All user-facing text lives here so non-code copy edits are trivial.
 
 export const copy = {
+  siteUrl: 'https://bantertoolbox.com',
+
   titles: {
     home: 'The Banter Toolbox — World Cup 2026',
     roast: 'AI Roasts Your Predictions — The Banter Toolbox',

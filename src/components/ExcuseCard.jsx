@@ -342,12 +342,13 @@ export default function ExcuseCard({ team, situationLabel, excuse, denialLevel }
     throw new Error('Sharing not supported in this browser')
   }
 
-  const run = async (fn) => {
+  const run = async (fn, eventName) => {
     setBusy(true)
     setFeedback('')
     try {
       const result = await fn()
       if (result === 'copied') setFeedback(copy.shareCard.copied)
+      if (eventName) window.plausible?.(eventName)
     } catch (err) {
       if (err?.name !== 'AbortError') setFeedback(copy.shareCard.shareFailed)
     } finally {
@@ -383,7 +384,7 @@ export default function ExcuseCard({ team, situationLabel, excuse, denialLevel }
         <button
           type="button"
           disabled={busy}
-          onClick={() => run(download)}
+          onClick={() => run(download, 'card_download')}
           className="rounded-xl bg-orange-500 px-7 py-4 font-display text-lg uppercase tracking-wide text-zinc-950 shadow-[0_0_24px] shadow-orange-500/30 hover:bg-orange-400 disabled:opacity-50 disabled:shadow-none"
         >
           {busy ? copy.shareCard.downloading : copy.buttons.downloadPng}
@@ -400,7 +401,7 @@ export default function ExcuseCard({ team, situationLabel, excuse, denialLevel }
       {feedback && <p className="text-center text-sm text-zinc-400">{feedback}</p>}
       <SocialShareLinks
         text={copy.excuseCard.shareText}
-        url={`${window.location.origin}/excuse`}
+        url={`${copy.siteUrl}/excuse`}
       />
     </section>
   )
