@@ -3,10 +3,11 @@
 // Usage: node scripts/e2e-regression.mjs  (dev server must be running on :5173)
 //
 // Verifies per tool: form flow → live generate → typing completes → share card
-// renders → Download PNG lands on disk at 1080×1350 → Share clipboard fallback
-// shows the "copied" feedback. Native navigator.share can't run headless (it
-// needs the OS share sheet), so the test disables canShare to force the
-// desktop clipboard path — the export pipeline up to share() is identical.
+// renders → "Share to feed/chat" lands a 1080×1350 PNG on disk → "Share to
+// Stories" lands a 1080×1920 PNG. Native navigator.share can't run headless
+// (it needs the OS share sheet), so the test disables canShare to force the
+// desktop download fallback — the export pipeline up to share() is identical.
+// Export wall-time is logged per format to watch html2canvas performance.
 
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
@@ -139,16 +140,16 @@ function pngSize(file) {
   return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) }
 }
 
-async function waitForDownload(fileName, timeoutMs = 60000) {
+async function waitForDownload(fileName, expectW, expectH, timeoutMs = 60000) {
   const full = path.join(DL_DIR, fileName)
   const start = Date.now()
   while (Date.now() - start < timeoutMs) {
     if (fs.existsSync(full) && !fs.existsSync(full + '.crdownload')) {
       await sleep(300) // let the write settle
       const { width, height } = pngSize(full)
-      if (width !== 1080 || height !== 1350)
-        throw new Error(`${fileName} is ${width}x${height}, expected 1080x1350`)
-      console.log(`  ✅ download: ${fileName} (1080x1350, ${fs.statSync(full).size} bytes)`)
+      if (width !== expectW || height !== expectH)
+        throw new Error(`${fileName} is ${width}x${height}, expected ${expectW}x${expectH}`)
+      console.log(`  ✅ download: ${fileName} (${width}x${height}, ${fs.statSync(full).size} bytes)`)
       return
     }
     await sleep(250)
@@ -156,12 +157,25 @@ async function waitForDownload(fileName, timeoutMs = 60000) {
   throw new Error(`download ${fileName} never arrived`)
 }
 
-async function testShareClipboard() {
-  // Force the desktop clipboard fallback (native share sheet can't open headless).
+// Both share buttons: disable canShare so each falls back to PNG download,
+// then verify dimensions per format and log export wall-time.
+async function testShareButtons(feedFile, storyFile) {
   await evaluate(`Object.defineProperty(navigator, 'canShare', { value: undefined }); true`)
-  await clickButton('Share')
-  await waitForText('Card copied to clipboard', 30000, 'share "copied" feedback')
-  console.log('  ✅ share: clipboard fallback confirmed ("Card copied to clipboard")')
+
+  let t = Date.now()
+  await clickButton('Share to feed')
+  await waitForDownload(feedFile, 1080, 1350)
+  console.log(`  ⏱ feed (4:5) export: ${((Date.now() - t) / 1000).toFixed(1)}s`)
+
+  t = Date.now()
+  await clickButton('Share to Stories')
+  await waitForDownload(storyFile, 1080, 1920)
+  console.log(`  ⏱ story (9:16) export: ${((Date.now() - t) / 1000).toFixed(1)}s`)
+
+  const fed = await evaluate(
+    `document.body.innerText.includes('PNG saved')`,
+  )
+  console.log(`  ${fed ? '✅' : '❌'} desktop fallback feedback ("PNG saved") shown`)
 }
 
 // ── flows ──────────────────────────────────────────────────────────────────
@@ -189,7 +203,7 @@ async function roastFlow() {
 
   await clickButton('Roast me')
   console.log('  ⏳ live /api/roast call + typing effect…')
-  await waitForText('Download PNG', 90000, 'roast share card (API + typing)')
+  await waitForText('Share to Stories', 90000, 'roast share card (API + typing)')
   const roastText = await evaluate(
     `document.querySelector('.italic.leading-relaxed, p.italic')?.innerText ?? ''`,
   )
@@ -197,9 +211,7 @@ async function roastFlow() {
   await sleep(1500) // preview images/fonts
   await screenshot('regress-roast-result.png')
 
-  await clickButton('Download PNG')
-  await waitForDownload('my-2026-predictions.png')
-  await testShareClipboard()
+  await testShareButtons('my-2026-predictions.png', 'my-2026-predictions-story.png')
 
   const crossLink = await evaluate(`!!document.querySelector('a[href="/excuse"]')`)
   console.log(`  ${crossLink ? '✅' : '❌'} cross-link to /excuse present`)
@@ -219,7 +231,7 @@ async function excuseFlow() {
   await clickGridTeam(0, 'Argentina') // opponent
   await clickButton('Defend my team')
   console.log('  ⏳ live /api/excuse call + typing effect…')
-  await waitForText('Download PNG', 90000, 'excuse share card (API + typing)')
+  await waitForText('Share to Stories', 90000, 'excuse share card (API + typing)')
   const excuseText = await evaluate(
     `[...document.querySelectorAll('p')].find((p) => p.className.includes('font-display'))?.innerText ?? ''`,
   )
@@ -227,9 +239,7 @@ async function excuseFlow() {
   await sleep(1500)
   await screenshot('regress-excuse-result.png')
 
-  await clickButton('Download PNG')
-  await waitForDownload('official-excuse.png')
-  await testShareClipboard()
+  await testShareButtons('official-excuse.png', 'official-excuse-story.png')
 
   const crossLink = await evaluate(`!!document.querySelector('a[href="/roast"]')`)
   console.log(`  ${crossLink ? '✅' : '❌'} cross-link to /roast present`)

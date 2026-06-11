@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { getTeam } from '../data/teams'
 import { copy } from '../data/copy'
-import { exportCardPng, downloadCard, shareCard } from '../lib/shareCard'
+import { exportCardPng, shareOrDownloadCard } from '../lib/shareCard'
 import Flag from './Flag'
 import SocialShareLinks from './SocialShareLinks'
 
@@ -177,11 +177,189 @@ function CardFace({ picks, roast, courageRating }) {
   )
 }
 
+// 1080×1920 (9:16) Stories variant — same content and design language as
+// CardFace, recomposed for the taller canvas: bigger type, more breathing room,
+// and ≥250px top/bottom safe margins so Instagram's username header and reply
+// bar never overlap the text when viewed full-screen.
+function StoryCardFace({ picks, roast, courageRating }) {
+  const champion = getTeam(picks.championId)
+  const chips = [
+    { label: copy.steps.three.championChip, team: champion },
+    { label: copy.steps.three.runnerUpChip, team: getTeam(picks.runnerUpId) },
+    { label: copy.steps.three.topScorerChip, text: `⚽ ${picks.topScorer}` },
+    { label: copy.steps.three.darkHorseChip, team: getTeam(picks.darkHorseId) },
+    { label: copy.steps.three.firstBigOutChip, team: getTeam(picks.firstBigOutId) },
+  ]
+
+  return (
+    <div
+      style={{
+        width: 1080,
+        height: 1920,
+        position: 'relative',
+        overflow: 'hidden',
+        background: `linear-gradient(160deg, ${champion.primary} 0%, ${champion.secondary} 100%)`,
+        fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif",
+        color: '#ffffff',
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(9,9,11,0.30) 0%, rgba(9,9,11,0.55) 45%, rgba(9,9,11,0.82) 100%)',
+        }}
+      />
+
+      {/* content column sits inside the Stories safe area */}
+      <div
+        style={{
+          position: 'relative',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '264px 72px 312px',
+        }}
+      >
+        <h1
+          style={{
+            fontFamily: "'Anton', 'Arial Narrow', sans-serif",
+            fontSize: 100,
+            fontWeight: 400,
+            textTransform: 'uppercase',
+            lineHeight: 1.0,
+            margin: 0,
+            textShadow: '0 4px 24px rgba(9,9,11,0.85)',
+          }}
+        >
+          {copy.shareCard.header.includes('2026') ? (
+            <>
+              {copy.shareCard.header.split('2026')[0]}
+              <span style={{ color: '#a3e635' }}>2026</span>
+              {copy.shareCard.header.split('2026')[1]}
+            </>
+          ) : (
+            copy.shareCard.header
+          )}
+        </h1>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 13, marginTop: 36 }}>
+          {chips.map(({ label, team, text }) => (
+            <div
+              key={label}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 20,
+                background: 'rgba(9,9,11,0.45)',
+                borderRadius: 999,
+                padding: '11px 34px',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 25,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: 2,
+                  color: 'rgba(255,255,255,0.55)',
+                  width: 260,
+                  flexShrink: 0,
+                }}
+              >
+                {label}
+              </span>
+              {team && (
+                <Flag team={team} size="md" eager className="rounded" style={{ height: 44, width: 'auto' }} />
+              )}
+              <span style={{ fontSize: 38, fontWeight: 800 }}>{team ? team.name : text}</span>
+            </div>
+          ))}
+        </div>
+
+        <p
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: 45,
+            lineHeight: 1.28,
+            fontWeight: 600,
+            fontStyle: 'italic',
+            margin: '34px 0 0',
+          }}
+        >
+          “{roast}”
+        </p>
+
+        <div
+          style={{
+            alignSelf: 'center',
+            transform: 'rotate(-5deg)',
+            background: '#a3e635',
+            borderRadius: 24,
+            padding: '17px 62px 23px',
+            textAlign: 'center',
+            marginTop: 30,
+            boxShadow: '0 12px 48px rgba(9,9,11,0.5)',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'Anton', 'Arial Narrow', sans-serif",
+              fontSize: 31,
+              fontWeight: 400,
+              letterSpacing: 6,
+              color: '#09090b',
+            }}
+          >
+            {copy.shareCard.courageLabel}
+          </div>
+          <div
+            style={{
+              fontFamily: "'Anton', 'Arial Narrow', sans-serif",
+              fontSize: 155,
+              fontWeight: 400,
+              lineHeight: 1,
+              color: '#09090b',
+            }}
+          >
+            {courageRating.toFixed(1)}
+            <span style={{ fontSize: 58, color: 'rgba(9,9,11,0.6)' }}> /10</span>
+          </div>
+        </div>
+      </div>
+
+      {/* watermark — sized up for full-screen, kept inside the bottom safe area */}
+      <div
+        style={{
+          position: 'absolute',
+          right: 64,
+          bottom: 254,
+          fontFamily: "'Anton', 'Arial Narrow', sans-serif",
+          fontSize: 40,
+          fontWeight: 400,
+          letterSpacing: 1,
+          color: 'rgba(255,255,255,0.9)',
+        }}
+      >
+        {copy.shareCard.watermark}
+      </div>
+    </div>
+  )
+}
+
+const FILE_NAMES = {
+  feed: 'my-2026-predictions.png',
+  story: 'my-2026-predictions-story.png',
+}
+
 export default function ShareCard({ picks, roast, courageRating, autoExportTest = false }) {
   const masterRef = useRef(null)
+  const storyRef = useRef(null)
   const previewBoxRef = useRef(null)
   const [previewScale, setPreviewScale] = useState(0)
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState('') // '' | 'feed' | 'story'
   const [feedback, setFeedback] = useState('')
 
   // Scale the preview CardFace to the container width (4:5 box).
@@ -215,26 +393,35 @@ export default function ShareCard({ picks, roast, courageRating, autoExportTest 
     })()
   }, [autoExportTest])
 
-  const run = async (fn, eventName) => {
-    setBusy(true)
+  const run = async (format) => {
+    setBusy(format)
     setFeedback('')
     try {
-      const result = await fn(masterRef.current)
-      if (result === 'copied') setFeedback(copy.shareCard.copied)
-      if (eventName) window.plausible?.(eventName)
+      const el = format === 'story' ? storyRef.current : masterRef.current
+      const result = await shareOrDownloadCard(el, {
+        format,
+        fileName: FILE_NAMES[format],
+        shareText: copy.shareCard.shareText,
+      })
+      if (result === 'downloaded') setFeedback(copy.shareCard.downloaded)
+      window.plausible?.('card_download', { props: { format } })
     } catch (err) {
       if (err?.name !== 'AbortError') setFeedback(copy.shareCard.shareFailed)
     } finally {
-      setBusy(false)
+      setBusy('')
     }
   }
 
   return (
     <section className="flex flex-col gap-4">
-      {/* off-screen 1080×1350 export master */}
+      {/* off-screen export masters — DOM render is cheap; html2canvas only runs
+          when a share button is tapped, so neither format is rasterized early */}
       <div style={{ position: 'absolute', left: -9999, top: 0 }} aria-hidden="true">
         <div ref={masterRef}>
           <CardFace picks={picks} roast={roast} courageRating={courageRating} />
+        </div>
+        <div ref={storyRef}>
+          <StoryCardFace picks={picks} roast={roast} courageRating={courageRating} />
         </div>
       </div>
 
@@ -251,22 +438,23 @@ export default function ShareCard({ picks, roast, courageRating, autoExportTest 
         )}
       </div>
 
-      <div className="flex justify-center gap-3">
+      {/* stacked full-width on mobile = thumb-friendly; row on larger screens */}
+      <div className="mx-auto flex w-full max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
         <button
           type="button"
-          disabled={busy}
-          onClick={() => run(downloadCard, 'card_download')}
+          disabled={!!busy}
+          onClick={() => run('feed')}
           className="rounded-xl bg-lime-400 px-7 py-4 font-display text-lg uppercase tracking-wide text-zinc-950 shadow-[0_0_24px] shadow-lime-400/30 hover:bg-lime-300 disabled:opacity-50 disabled:shadow-none"
         >
-          {busy ? copy.shareCard.downloading : copy.buttons.downloadPng}
+          {busy === 'feed' ? copy.shareCard.downloading : copy.buttons.shareFeed}
         </button>
         <button
           type="button"
-          disabled={busy}
-          onClick={() => run(shareCard)}
+          disabled={!!busy}
+          onClick={() => run('story')}
           className="rounded-xl bg-orange-500 px-7 py-4 font-display text-lg uppercase tracking-wide text-zinc-950 shadow-[0_0_24px] shadow-orange-500/30 hover:bg-orange-400 disabled:opacity-50 disabled:shadow-none"
         >
-          {copy.buttons.share}
+          {busy === 'story' ? copy.shareCard.downloading : copy.buttons.shareStory}
         </button>
       </div>
       {feedback && <p className="text-center text-sm text-zinc-400">{feedback}</p>}
