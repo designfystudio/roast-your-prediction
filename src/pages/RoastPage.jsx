@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getTeam } from '../data/teams'
 import { copy } from '../data/copy'
 import { requestRoast } from '../lib/api'
@@ -146,6 +147,16 @@ export default function RoastPage() {
               >
                 {copy.buttons.startOver}
               </button>
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-center">
+              <p className="text-sm text-zinc-500">Team already breaking your heart?</p>
+              <Link
+                to="/excuse"
+                className="mt-1 inline-block font-display text-sm uppercase tracking-wide text-orange-400 hover:text-orange-300"
+              >
+                Get your official excuse →
+              </Link>
             </div>
           </div>
         )}

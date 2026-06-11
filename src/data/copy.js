@@ -4,6 +4,7 @@ export const copy = {
   titles: {
     home: 'The Banter Toolbox — World Cup 2026',
     roast: 'AI Roasts Your Predictions — The Banter Toolbox',
+    excuse: 'Fan Excuse Generator — The Banter Toolbox',
   },
 
   nav: {
@@ -98,6 +99,33 @@ export const copy = {
     copied: 'Card copied to clipboard 📋',
     shareFailed: 'Could not share — try Download instead.',
     downloading: 'Rendering…',
+  },
+
+  excuse: {
+    title: 'Fan Excuse Generator',
+    tagline: "No defeat is ever your team's fault.",
+    steps: {
+      one: {
+        title: 'Step 1 — Your Team',
+        label: 'Who are you defending today?',
+      },
+      two: {
+        title: 'Step 2 — What Happened?',
+        situationLabel: 'The crime',
+        opponentLabel: 'Optional: the perpetrator',
+        opponentSkip: 'Clear opponent',
+      },
+    },
+    buttons: {
+      defend: 'Defend my team',
+      defendAgain: 'Defend again',
+      startOver: 'Start over',
+    },
+    loading: { line: 'The Advocate is preparing your defence…' },
+    errors: { failed: 'The Advocate has been temporarily disbarred.' },
+    result: {
+      denialLabel: 'Denial Level',
+    },
   },
 
   footer: {

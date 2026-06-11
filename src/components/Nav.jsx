@@ -20,11 +20,16 @@ export default function Nav() {
           >
             {copy.nav.roast}
           </NavLink>
-          {/* not a link until the excuse tool ships */}
-          <span className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-display text-sm uppercase tracking-wider text-zinc-600">
+          <NavLink
+            to="/excuse"
+            className={({ isActive }) =>
+              `rounded-lg px-3 py-1.5 font-display text-sm uppercase tracking-wider transition-colors ${
+                isActive ? 'bg-orange-500/15 text-orange-400' : 'text-zinc-400 hover:text-zinc-100'
+              }`
+            }
+          >
             {copy.nav.excuse}
-            <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-400">{copy.nav.soon}</span>
-          </span>
+          </NavLink>
         </div>
       </div>
     </nav>

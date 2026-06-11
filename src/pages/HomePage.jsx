@@ -56,18 +56,19 @@ export default function HomePage() {
           </span>
         </Link>
 
-        <div className="rounded-xl border border-zinc-800 border-t-4 border-t-orange-500 bg-zinc-900 p-6 opacity-70">
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="font-display text-2xl uppercase tracking-wide text-zinc-100">
-              {copy.home.excuseTool.name}
-            </h2>
-            <span className="rounded-full bg-orange-500/15 px-3 py-1 font-display text-xs uppercase tracking-wider text-orange-400">
-              {copy.home.excuseTool.badge}
-            </span>
-          </div>
+        <Link
+          to="/excuse"
+          className="group rounded-xl border border-zinc-800 border-t-4 border-t-orange-500 bg-zinc-900 p-6 transition hover:border-zinc-700 hover:shadow-[0_0_24px] hover:shadow-orange-500/20"
+        >
+          <h2 className="font-display text-2xl uppercase tracking-wide text-zinc-100 group-hover:text-orange-400">
+            {copy.home.excuseTool.name}
+          </h2>
           <p className="mt-2 text-zinc-400">{copy.home.excuseTool.pitch}</p>
           <p className="mt-3 text-sm italic text-zinc-500">{copy.home.excuseTool.sample}</p>
-        </div>
+          <span className="mt-4 inline-block font-display text-lg uppercase tracking-wide text-orange-400">
+            Get your excuse →
+          </span>
+        </Link>
 
         <EmailSlot />
       </main>
