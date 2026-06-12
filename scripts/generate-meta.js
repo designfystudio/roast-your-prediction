@@ -2,7 +2,7 @@
 // Runs as part of `npm run build`, so it executes on Vercel too.
 import { readFileSync, writeFileSync } from 'fs';
 
-const SITE = 'https://www.bantertoolbox.com';
+const SITE = 'https://bantertoolbox.com';
 
 const routes = {
   'index.html': {
