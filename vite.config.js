@@ -1,5 +1,4 @@
 import fs from 'node:fs'
-import { resolve } from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -51,17 +50,8 @@ export default defineConfig(({ mode }) => {
   process.env.ANTHROPIC_API_KEY ??= loadEnv(mode, process.cwd(), '').ANTHROPIC_API_KEY
   return {
     plugins: [react(), tailwindcss(), apiRoutes()],
-    build: {
-      // Multi-page: each HTML file gets its own crawlable <head> with route-specific
-      // OG/Twitter tags. Vite processes all three, sharing the same JS chunk.
-      // Vercel routes /roast → /roast.html and /excuse → /excuse.html (vercel.json).
-      rollupOptions: {
-        input: {
-          main: resolve('./index.html'),
-          roast: resolve('./roast.html'),
-          excuse: resolve('./excuse.html'),
-        },
-      },
-    },
+    // Per-route OG/Twitter heads: scripts/generate-meta.js runs after `vite build`
+    // and writes dist/roast.html + dist/excuse.html from dist/index.html.
+    // Vercel routes /roast → /roast.html and /excuse → /excuse.html (vercel.json).
   }
 })

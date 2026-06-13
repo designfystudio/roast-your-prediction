@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/generate-meta.js",
     "preview": "vite preview"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
+    "@vercel/analytics": "^2.0.1",
     "html2canvas-pro": "^2.0.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
