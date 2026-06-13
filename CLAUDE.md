@@ -33,12 +33,15 @@ A viral single-page web tool for World Cup 2026. User picks their tournament pre
 3. "Roast me" button → typing-effect roast text → share card below with Courage Rating
 
 ## The roast prompt (lives in /api/roast.js — this is the product)
-Persona: a smug, world-weary football pundit who has seen every tournament since 1970, roasting with affection, never cruelty.
+Persona: a smug, world-weary football pundit who has seen every tournament since 1970 — merciless, unapologetic, funny and cutting, never vulgar.
 Hard rules enforced IN the system prompt:
 - Output strict JSON: `{ "roast": "...", "courageRating": N }` — nothing else
 - Roast is 2–3 sentences MAX (share cards die over ~50 words)
 - courageRating: 0–10, one decimal. Safe picks (Brazil/France to win) score LOW with mockery for cowardice; chaotic picks score HIGH with mockery for delusion
-- Mock the PICKS, the safety, the delusion, the bandwagon — never nationalities, never players as people, no injuries/tragedies, no profanity, no betting language
+- Comedic scope (mirrors the system prompts; keep all three in sync — `/api/roast.js`, `/api/excuse.js`, here):
+  - **Allowed:** the PICKS, the safety/delusion/bandwagon, football history (all competitions — World Cups, Champions League, leagues), tactics, fate, footballing rivalries (Brazil–Argentina, Spain–Portugal, a spicy USA–Iran fixture) and accents, a player's on-pitch performances and well-known footballing persona (ego, theatrics, the GOAT debate, refusing to pass), and a player's reputation for being injury-PRONE (Dembélé, Hazard — the availability joke, never the suffering)
+  - **Forbidden, no exceptions:** profanity; betting/odds/gambling; religion; national character / ethnic stereotypes (denigrating a people — accents and rivalry are fine); real deaths, tragedies or disasters; career-ending injuries, on-pitch collapses or medical emergencies; and anyone's health, family, sexuality, appearance or legal/criminal matters
+  - Only real, famous, verifiable on-the-record moments — never invent or misremember incidents
 - Include 6–8 few-shot examples in the system prompt covering: ultra-safe slate, hipster slate, homer slate (picks own country for everything), chaos slate. These examples define the voice — they get hand-tuned, do not rewrite them without being asked.
 
 ## Share card spec
